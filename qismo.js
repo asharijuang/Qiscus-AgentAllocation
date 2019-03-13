@@ -423,7 +423,7 @@ jQuery(document).ready(function () {
             }
         if(origin) params.origin = origin;
         if(roomBadge) params.room_badge = roomBadge;
-        debugger;
+        
         var initRoom = jQuery.post(baseURL + '/api/v1/qiscus/initiate_chat', params);
             initRoom.done(function (data) {
                 jQuery('.qcw-cs-container').removeClass('qcw-cs-container--open')

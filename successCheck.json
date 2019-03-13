@@ -1,0 +1,12 @@
+{ 
+    "status": 200, 
+    "data": { 
+        "id": 3, 
+        "prixa_transaction_id": "3", 
+        "qismo_patient_token": "DmA5oIx0T759ZgDBMJ5w", 
+        "room_id": 2052763, 
+        "created_at": "2019-03-13T03:02:08.805+07:00", 
+        "updated_at": "2019-03-13T03:02:08.805+07:00", 
+        "post_comment_api": "https://api.qiscus.com/api/v2/sdk/post_comment" 
+    } 
+}

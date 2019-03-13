@@ -1,0 +1,6 @@
+{ "error": 
+    { 
+        "status": 404, 
+        "message": "consultation with transaction id 1281821 not found" 
+    }
+}
