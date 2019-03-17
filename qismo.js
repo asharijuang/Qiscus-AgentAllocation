@@ -1,7 +1,7 @@
 jQuery(document).ready(function () {
 
     var env = $.getJSON("ENV.json", function(data){
-            debugger
+            // debugger
     });
 
     if ('Notification' in window && Notification.permission !== "granted") Notification.requestPermission();
@@ -98,7 +98,7 @@ jQuery(document).ready(function () {
             origin = window.location.href,
             roomBadge = qismoConfig.roomBadge,
             avatar = 'https://d1edrlpyc25xu0.cloudfront.net/kiwari-prod/image/upload/wMWsDZP6ta/1516689726-ic_qiscus_client.png';
-            debugger; 
+            
         if(userData) {
             userId = userData.user_id;
             userName = userData.user_name;
@@ -108,6 +108,11 @@ jQuery(document).ready(function () {
 
         QiscusSDK.core.init({
             AppId: appId,
+            options: {
+                newMessagesCallback: function(messages) {
+
+                }
+            }
         })
         QiscusSDK.core.getNonce().then(function(res) {
             window.nonce = res.nonce
@@ -119,6 +124,11 @@ jQuery(document).ready(function () {
             attachConsultationFormToDOM();
         });
     }
+
+    function gotNewMessage(message) {
+        console.log(message);
+    }
+
     function getAppSession() {
         var baseURL = qismoConfig.qismoBaseUrl || 'https://qismo-stag.qiscus.com';
         return $.get(baseURL + '/' + qismoConfig.appID + '/get_session')
@@ -436,10 +446,10 @@ jQuery(document).ready(function () {
                 jQuery('body').removeClass('resolved-conversation');
                 jQuery('.qcw-cs-container').remove()
 
-                window.isSessional = data.data.is_sessional
-                window.roomId = data.data.room_id
-                var sdkEmail = userId,
-                    identityToken = data.data.identity_token
+                //window.isSessional = data.data.is_sessional
+                // window.roomId = data.data.room_id
+                // var sdkEmail = userId,
+                    identityToken = real.identityToken
                 // var password = data.data.sdk_user.password,
                 //     sdkEmail = data.data.sdk_user.email
 
