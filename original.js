@@ -3,7 +3,6 @@ jQuery(document).ready(function () {
     var isMinimized = true,
         ls = JSON.parse(localStorage.getItem('qismo-widget'));
 
-
     var defaultConfig = {
         "customerServiceAvatar": "https://d1edrlpyc25xu0.cloudfront.net/kiwari-prod/image/upload/Ri-pxHv6e1/default_avatar.png",
         "customerServiceName": "Customer Service",
@@ -47,8 +46,18 @@ jQuery(document).ready(function () {
 
     const defaultInitOptions = {
         loginSuccessCallback: function (userData) {
-            if (openAtStart) {
-                QiscusSDK.core.UI.chatGroup(window.roomId)
+
+            // initiate message after create consultation/session
+            if (window.roomId) {
+                QiscusSDK.core.sendComment(window.roomId, window.keluhan)
+                .then(function (comment) {
+                // On success
+                
+                })
+                .catch(function (error) {
+                // On error
+                
+                })
             }
         },
         roomChangedCallback: function (data) {
@@ -65,13 +74,12 @@ jQuery(document).ready(function () {
         newMessagesCallback: function (data) {
             if ('Notification' in window && Notification.permission !== "granted") showNotif(data);
             // scrolling to bottom
-            setTimeout(function () {
-                lastCommentId = QiscusSDK.core.selected.comments[QiscusSDK.core.selected.comments.length - 1].id;
-                theElement = document.getElementById(lastCommentId);
-                theElement.scrollIntoView({ block: 'end', behaviour: 'smooth' })
-            }, 200);
+            // setTimeout(function () {
+            //     lastCommentId = QiscusSDK.core.selected.comments[QiscusSDK.core.selected.comments.length - 1].id;
+            //     theElement = document.getElementById(lastCommentId);
+            //     theElement.scrollIntoView({ block: 'end', behaviour: 'smooth' })
+            // }, 200);
             if (data[0].type == 'system_event') {
-                
                 if (data[0].message.toLowerCase().indexOf('as resolved') > -1) {
                     getAppSession().then(function(res){
                         if(res.data.is_sessional) $('body').toggleClass('resolved-conversation');
@@ -82,7 +90,8 @@ jQuery(document).ready(function () {
                 if (data[0].message.toLowerCase().indexOf('joined this conversation') > -1) {
                     // redirect to chat view
                     debugger
-                    renderStartNewChat();
+                    // startChat();
+                    // QiscusSDK.core.UI.chatGroup(window.roomId);
                 }
             }
         }
@@ -134,15 +143,14 @@ jQuery(document).ready(function () {
             // debugger
             var initRoom = jQuery.post(baseURL + '/api/v1/qiscus/initiate_chat', params);
             initRoom.done(function (data) {
-                // jQuery('.qcw-cs-container').removeClass('qcw-cs-container--open');
-                // jQuery('body').removeClass('resolved-conversation');
-                // jQuery('.qcw-cs-container').remove();
+                
                 jQuery('.qcw-cs-box-form').remove()
                 jQuery('.qcw-cs-close').remove()
-                attachWaitingDoctorToDOM();
+                attachWaitingDoctorToDOM(userData);
 
                 window.isSessional = data.data.is_sessional
                 window.roomId = data.data.room_id
+                window.keluhan  = userData.keluhan
                 var sdkEmail = userId,
                 identityToken = data.data.identity_token
                 // var password = data.data.sdk_user.password,
@@ -158,11 +166,7 @@ jQuery(document).ready(function () {
                     QiscusSDK.core.setUserWithIdentityToken(verifyResponse);
                 })
                 // QiscusSDK.core.setUser(sdkEmail, password, userName, 'https://d1edrlpyc25xu0.cloudfront.net/kiwari-prod/image/upload/wMWsDZP6ta/1516689726-ic_qiscus_client.png')
-                QiscusSDK.render()
-
-                QiscusSDK.core.UI.widgetButtonText = getButtonText();
-
-                QiscusSDK.core.UI.widgetButtonIcon = qismoConfig.buttonIcon || defaultConfig.buttonIcon;
+                
             });
         });
     }
@@ -519,6 +523,6 @@ jQuery(document).ready(function () {
                     '<h3>Mencari dokter...</h3>' +
                     '<p>Kami akan menghubungkan anda dengan dokter yang tepat</p>' +
                 '</div>')
-        waitingAgent.prependTo('.qcw-cs-wrapper');        
+        waitingAgent.prependTo('.qcw-cs-wrapper');  
     }
 });
