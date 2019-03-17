@@ -81,6 +81,7 @@ jQuery(document).ready(function () {
 
                 if (data[0].message.toLowerCase().indexOf('joined this conversation') > -1) {
                     // redirect to chat view
+                    debugger
                     renderStartNewChat();
                 }
             }
@@ -133,9 +134,12 @@ jQuery(document).ready(function () {
             // debugger
             var initRoom = jQuery.post(baseURL + '/api/v1/qiscus/initiate_chat', params);
             initRoom.done(function (data) {
-                jQuery('.qcw-cs-container').removeClass('qcw-cs-container--open');
-                jQuery('body').removeClass('resolved-conversation');
-                jQuery('.qcw-cs-container').remove();
+                // jQuery('.qcw-cs-container').removeClass('qcw-cs-container--open');
+                // jQuery('body').removeClass('resolved-conversation');
+                // jQuery('.qcw-cs-container').remove();
+                jQuery('.qcw-cs-box-form').remove()
+                jQuery('.qcw-cs-close').remove()
+                attachWaitingDoctorToDOM();
 
                 window.isSessional = data.data.is_sessional
                 window.roomId = data.data.room_id
@@ -426,5 +430,95 @@ jQuery(document).ready(function () {
             localStorage.setItem('qismo-widget', JSON.stringify(consultationData))
             initQiscusWidget(consultationData,true);
         });
+    }
+
+    function attachConsultationFormToDOM(userData) {
+        var buttonText = getButtonText();
+        var buttonIcon = qismoConfig.buttonIcon || defaultConfig.buttonIcon
+        var greet = qismoConfig.formGreet || defaultConfig.formGreet
+
+        if(buttonIcon){
+            var img = '<img src="'+ buttonIcon +'">'
+        }else{
+            var img = ''
+        }
+
+        if(buttonText){
+            var text = '<div>'+ buttonText +'</div>'
+        }else{
+            var text = ''
+        }
+
+        var chatForm = jQuery(
+                '<span class="qcw-cs-close">&#x268A;</span>' +
+                '<div class="qcw-cs-box-form">' +
+                    '<h3>Request Consultation</h3>' +
+                    '<p>Apa yang ingin di diskusikan</p>' +
+                    '<form>' +
+                        '<div class="qcw-cs-form-group">' +
+                            '<input type="text" name="keluhan" class="qcw-cs-form-field" id="inputkeluhan" placeholder="Tulis keluhan">' +
+                        '</div>' +
+                        '<div class="qcw-cs-form-group">' +
+                            '<button name="submitform" type="submit" class="qcw-cs-submit-form">Mulai Konsultasi</button>' +
+                        '</div>' +
+                    '</form>' +
+                '</div>')
+        chatForm.prependTo('.qcw-cs-wrapper');
+        attachEventListenerChat()
+        if(openAtStart && !welcomeMessageStatus){
+            loginFormOpened = true;
+            $('.qcw-cs-trigger-button').click()
+        }
+
+        jQuery('.qcw-cs-wrapper form').on('submit', function (e) {
+            e.preventDefault();
+            var _self = jQuery(this),
+                submitBtn = jQuery('button[name="submitform"]'),
+                randomKey = Date.now(),
+                consultationData = {
+                    user_id: userData.user_id,
+                    user_name: userData.user_name,
+                    keluhan : jQuery('#inputkeluhan').val()
+                }
+            if (!consultationData.keluhan) {
+                if (jQuery('.qcw-cs-form-group.error').length === 0) {
+                    jQuery('<div class="qcw-cs-form-group error"><span>Keluhan tidak boleh kosong!</span></div>').prependTo(_self);
+                }
+                return
+            } else {
+                jQuery('.qcw-cs-form-group.error').remove();
+            }
+            submitBtn.attr('type', 'button')
+            submitBtn.prop('disabled', '')
+            submitBtn.html('Loading...')
+            newUser = true
+            localStorage.setItem('qismo-widget', JSON.stringify(consultationData))
+            initQiscusWidget(consultationData,true);
+        });
+    }
+
+    function attachWaitingDoctorToDOM(userData) {
+        var buttonText = getButtonText();
+        var buttonIcon = qismoConfig.buttonIcon || defaultConfig.buttonIcon
+        var greet = qismoConfig.formGreet || defaultConfig.formGreet
+
+        if(buttonIcon){
+            var img = '<img src="'+ buttonIcon +'">'
+        }else{
+            var img = ''
+        }
+
+        if(buttonText){
+            var text = '<div>'+ buttonText +'</div>'
+        }else{
+            var text = ''
+        }
+
+        var waitingAgent = jQuery(
+                '<div class="qcw-cs-box-form">' +
+                    '<h3>Mencari dokter...</h3>' +
+                    '<p>Kami akan menghubungkan anda dengan dokter yang tepat</p>' +
+                '</div>')
+        waitingAgent.prependTo('.qcw-cs-wrapper');        
     }
 });
