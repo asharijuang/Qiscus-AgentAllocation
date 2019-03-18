@@ -46,18 +46,25 @@ jQuery(document).ready(function () {
 
     const defaultInitOptions = {
         loginSuccessCallback: function (userData) {
+            if (openAtStart) {
+                const room = window.roomId;
+                QiscusSDK.render()
+                QiscusSDK.core.UI.widgetButtonText = getButtonText();
+                QiscusSDK.core.UI.widgetButtonIcon = qismoConfig.buttonIcon || defaultConfig.buttonIcon;
+                QiscusSDK.core.UI.chatGroup(room)
 
-            // initiate message after create consultation/session
-            if (window.roomId) {
-                QiscusSDK.core.sendComment(window.roomId, window.keluhan)
-                .then(function (comment) {
-                // On success
-                
-                })
-                .catch(function (error) {
-                // On error
-                
-                })
+                // initiate message after create consultation/session
+                if (window.roomId) {
+                    QiscusSDK.core.sendComment(window.roomId, window.keluhan)
+                    .then(function (comment) {
+                    // On success
+                    
+                    })
+                    .catch(function (error) {
+                    // On error
+                    
+                    })
+                }
             }
         },
         roomChangedCallback: function (data) {
@@ -89,9 +96,11 @@ jQuery(document).ready(function () {
 
                 if (data[0].message.toLowerCase().indexOf('joined this conversation') > -1) {
                     // redirect to chat view
-                    debugger
-                    // startChat();
-                    // QiscusSDK.core.UI.chatGroup(window.roomId);
+                    jQuery('.qcw-cs-container').removeClass('qcw-cs-container--open')
+                    jQuery('body').removeClass('resolved-conversation');
+                    jQuery('.qcw-cs-container').remove()
+                    // show chat
+                    
                 }
             }
         }
@@ -166,7 +175,6 @@ jQuery(document).ready(function () {
                     QiscusSDK.core.setUserWithIdentityToken(verifyResponse);
                 })
                 // QiscusSDK.core.setUser(sdkEmail, password, userName, 'https://d1edrlpyc25xu0.cloudfront.net/kiwari-prod/image/upload/wMWsDZP6ta/1516689726-ic_qiscus_client.png')
-                
             });
         });
     }
